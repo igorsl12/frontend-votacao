@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro - Paredão BBB</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" style="flex-direction: column; align-items: center; margin-top: 50px;">
+        <div class="card" style="width: 300px;">
+            <h2>Criar Conta</h2>
+            
+            <input type="text" id="nome-cad" placeholder="Seu Nome Completo" 
+                   style="width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc;">
+            
+            <input type="email" id="email-cad" placeholder="Seu melhor e-mail" 
+                   style="width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc;">
+            
+            <input type="password" id="senha-cad" placeholder="Crie uma senha" 
+                   style="width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc;">
+            
+            <button onclick="cadastrar()" style="background-color: #2ed573;">CADASTRAR</button>
+            <button onclick="window.location.href='login.html'" style="background-color: #747d8c; margin-top: 5px;">VOLTAR PARA LOGIN</button>
+            
+            <p id="mensagem-retorno" style="display: none; margin-top: 15px; font-weight: bold;"></p>
+        </div>
+    </div>
+
+    <script src="cadastro.js"></script>
+</body>
+</html>

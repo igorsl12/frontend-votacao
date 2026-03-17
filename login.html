@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Paredão BBB</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" style="flex-direction: column; align-items: center; margin-top: 100px;">
+        <div class="card" style="width: 300px;">
+            <h2>Acesso ao Sistema</h2>
+            
+            <input type="email" id="email" placeholder="Digite seu e-mail" 
+                   style="width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc;">
+            
+            <input type="password" id="senha" placeholder="Digite sua senha" 
+                   style="width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc;">
+            
+            <button onclick="fazerLogin()">ENTRAR</button>
+            
+            <p id="mensagem-erro" style="color: red; display: none; margin-top: 15px;">E-mail ou senha inválidos!</p>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+    <p id="mensagem-erro" style="color: red; display: none; margin-top: 15px;">E-mail ou senha inválidos!</p>
+            
+            <p style="margin-top: 15px; font-size: 14px;">Não tem conta? <a href="cadastro.html">Cadastre-se</a></p>
+</body>
+</html>

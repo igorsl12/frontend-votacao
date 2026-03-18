@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Sistema de Votação</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        
+        <aside class="sidebar">
+            <div class="user-info">
+                <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=3498db&color=fff" alt="Avatar do Usuário" class="avatar">
+                <h3 id="user-name-menu">Carregando...</h3>
+                <p id="user-email-menu">Carregando...</p>
+            </div>
+            
+            <nav class="menu" id="menu-dinamico">
+                </nav>
+
+            <div class="logout-section">
+                <a href="#" id="btn-sair" class="menu-item logout-btn"><span>🚪</span> Sair</a>
+            </div>
+        </aside>
+
+        <main class="content" style="display: flex; flex-direction: column; align-items: center; padding-top: 40px;">
+            
+            <header style="text-align: center; margin-bottom: 30px;">
+                <h2 style="font-size: 2.2em; color: #2c3e50;">Configurações</h2>
+                <p style="color: #7f8c8d; font-size: 1.1em; margin-top: 8px;">Gerencie a segurança da sua conta.</p>
+            </header>
+
+            <div id="mensagem-alerta" class="alerta oculta"></div>
+
+            <div class="card" style="width: 100%; max-width: 500px; margin: 0 auto 30px auto; padding: 30px; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-radius: 15px;">                
+                <h3 style="margin-bottom: 20px; color: #2c3e50; font-size: 1.4em; border-bottom: 2px solid #f4f7f6; padding-bottom: 15px;">🔑 Alterar Senha</h3>
+                
+                <form id="form-senha" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <label style="display: block; font-weight: bold; color: #34495e; margin-bottom: 5px;">Senha Atual</label>
+                        <input type="password" id="senha-atual" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #bdc3c7; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; color: #34495e; margin-bottom: 5px;">Nova Senha</label>
+                        <input type="password" id="nova-senha" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #bdc3c7; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; color: #34495e; margin-bottom: 5px;">Confirmar Nova Senha</label>
+                        <input type="password" id="confirmar-senha" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #bdc3c7; box-sizing: border-box;">
+                    </div>
+
+                    <button type="submit" style="background-color: #3498db; color: white; border: none; border-radius: 8px; padding: 12px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: 0.3s; margin-top: 5px;">
+                        Salvar Nova Senha
+                    </button>
+                </form>
+            </div>
+
+            <div class="card" style="width: 100%; max-width: 500px; margin: 0 auto; padding: 30px; box-sizing: border-box; border: 2px solid #ffcccc; background-color: #fffafb; border-radius: 15px;">                
+                <h3 style="margin-bottom: 10px; color: #e74c3c; font-size: 1.4em;">⚠️ Zona de Perigo</h3>
+                <p style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 20px;">Ao excluir sua conta, você perderá acesso ao sistema permanentemente. Esta ação não pode ser desfeita.</p>
+                
+                <button id="btn-excluir-conta" style="width: 100%; background-color: #e74c3c; color: white; border: none; border-radius: 8px; padding: 12px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: 0.3s;">
+                    Excluir Minha Conta
+                </button>
+            </div>
+
+        </main>
+        
+    </div>
+
+    <script src="configuracoes.js"></script>
+</body>
+</html>

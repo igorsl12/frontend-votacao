@@ -2,27 +2,46 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastro - Paredão BBB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta - Sistema de Votação</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div class="container" style="flex-direction: column; align-items: center; margin-top: 50px;">
-        <div class="card" style="width: 300px;">
+<body class="login-page">
+
+    <div class="login-container">
+        <div class="login-header">
             <h2>Criar Conta</h2>
+            <p>Cadastre-se para participar das votações do paredão.</p>
+        </div>
+
+        <p id="mensagem-retorno" style="display: none; text-align: center; font-weight: bold; margin-bottom: 15px; font-size: 0.9em;"></p>
+
+        <form id="form-cadastro" class="login-form">
+            <div class="input-group">
+                <label for="nome-cad">Nome Completo</label>
+                <input type="text" id="nome-cad" placeholder="Seu nome completo" required>
+            </div>
+
+            <div class="input-group">
+                <label for="email-cad">E-mail</label>
+                <input type="email" id="email-cad" placeholder="seuemail@email.com" required>
+            </div>
+
+            <div class="input-group">
+                <label for="senha-cad">Senha</label>
+                <input type="password" id="senha-cad" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-votar">Cadastrar</button>
             
-            <input type="text" id="nome-cad" placeholder="Seu Nome Completo" 
-                   style="width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc;">
-            
-            <input type="email" id="email-cad" placeholder="Seu melhor e-mail" 
-                   style="width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc;">
-            
-            <input type="password" id="senha-cad" placeholder="Crie uma senha" 
-                   style="width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc;">
-            
-            <button onclick="cadastrar()" style="background-color: #2ed573;">CADASTRAR</button>
-            <button onclick="window.location.href='login.html'" style="background-color: #747d8c; margin-top: 5px;">VOLTAR PARA LOGIN</button>
-            
-            <p id="mensagem-retorno" style="display: none; margin-top: 15px; font-weight: bold;"></p>
+            <div style="text-align: center; margin-top: 20px;">
+                <a href="login.html" style="color: #3498db; text-decoration: none; font-size: 0.9em; font-weight: bold;">Já possui uma conta? Faça o Login</a>
+            </div>
+        </form>
+        
+        <div class="login-footer">
+            <p>Todos direitos reservados &copy; 2026 </p>
+            <p>Desenvolvido por Igor Silva Lima </p>
         </div>
     </div>
 

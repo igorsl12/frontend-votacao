@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('usuarioLogadoId', usuario.id);
                 localStorage.setItem('usuarioLogadoNome', usuario.nome);
                 localStorage.setItem('usuarioLogadoEmail', usuario.email); 
+                localStorage.setItem('usuarioLogadoPerfil', usuario.perfil);
 
                 // 3. Verificamos o perfil para fazer o redirecionamento correto
                 // ATENÇÃO: Se na sua classe Java o atributo se chamar algo diferente de 'perfil',

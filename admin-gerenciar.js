@@ -12,7 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// ==========================================
 // 1. LER (Read) - Puxa os dados e desenha os CARDS
+// ==========================================
 async function carregarCardsParticipantes() {
     try {
         const resposta = await fetch('http://localhost:8081/participantes');
@@ -22,62 +24,111 @@ async function carregarCardsParticipantes() {
         grid.innerHTML = ''; // Limpa o "Carregando..."
 
         if (participantes.length === 0) {
-            grid.innerHTML = '<p style="text-align: center; width: 100%;">Nenhum participante no paredão.</p>';
+            grid.innerHTML = '<p style="text-align: center; grid-column: span 3; color: #7f8c8d;">Nenhum candidato cadastrado.</p>';
             return;
         }
 
         participantes.forEach(p => {
             const card = document.createElement('div');
-            // Usamos a classe do seu CSS que já deixa o visual de caixinha
             card.className = 'card-participante';
             
-            // Montamos o HTML interno do card com a foto, nome e os dois botões
+            // LÓGICA DAS FOTOS: Usa a foto do banco, ou gera uma automática
+            let imagemExibicao = p.urlFoto;
+            if (!imagemExibicao || imagemExibicao.trim() === "") {
+                const nomeCod = encodeURIComponent(p.nome);
+                imagemExibicao = `https://ui-avatars.com/api/?name=${nomeCod}&background=ecf0f1&color=2c3e50&size=200`;
+            }
+
             card.innerHTML = `
-                <img src="https://via.placeholder.com/120" class="foto-participante" alt="Foto">
-                <h3>${p.nome}</h3>
-                <p>ID: ${p.id}</p>
+                <img src="${imagemExibicao}" alt="Foto de ${p.nome}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #3498db; margin-bottom: 15px;">
+                <h3 style="color: #2c3e50; margin-bottom: 5px;">${p.nome}</h3>
+                <p style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 15px;">ID do Sistema: #${p.id}</p>
                 
-                <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button onclick="editarParticipante(${p.id}, '${p.nome}')" style="background: #f1c40f; color: #fff; border: none; padding: 10px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: bold;">Editar</button>
-                    <button onclick="deletarParticipante(${p.id}, '${p.nome}')" style="background: #e74c3c; color: #fff; border: none; padding: 10px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: bold;">Excluir</button>
+                <div style="display: flex; gap: 10px; margin-top: auto; width: 100%;">
+                    <button onclick="editarParticipante(${p.id}, '${p.nome}')" style="background: #f1c40f; color: #fff; border: none; padding: 10px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: bold; transition: 0.2s;">Editar</button>
+                    <button onclick="deletarParticipante(${p.id}, '${p.nome}')" style="background: #e74c3c; color: #fff; border: none; padding: 10px; border-radius: 8px; cursor: pointer; flex: 1; font-weight: bold; transition: 0.2s;">Excluir</button>
                 </div>
             `;
             grid.appendChild(card);
         });
     } catch (erro) {
         console.error('Erro ao listar:', erro);
-        document.getElementById('lista-participantes-admin').innerHTML = '<p>Erro ao carregar dados do servidor.</p>';
+        document.getElementById('lista-participantes-admin').innerHTML = '<p style="color: red; grid-column: span 3;">Erro ao carregar dados do servidor.</p>';
     }
 }
 
-// 2. CRIAR (Create)
+// ==========================================
+// 2. CRIAR (Create) - COM UPLOAD DE FOTO
+// ==========================================
 async function adicionarParticipante(evento) {
     evento.preventDefault();
+    
     const inputNome = document.getElementById('nome-novo-participante');
-    const nome = inputNome.value;
+    const inputArquivo = document.getElementById('input-arquivo-foto');
+    
+    const nome = inputNome.value.trim();
+    let urlDaFotoSalva = ""; // Começa vazia por padrão
 
+    if (!nome) {
+        mostrarAlerta("O nome é obrigatório!", "erro");
+        return;
+    }
+
+    // PASSO A: SE O ADMIN ESCOLHEU UMA IMAGEM, FAZ O UPLOAD PRO SERVIDOR JAVA
+    if (inputArquivo.files.length > 0) {
+        const formData = new FormData();
+        formData.append("foto", inputArquivo.files[0]); 
+
+        try {
+            const respostaUpload = await fetch('http://localhost:8081/arquivos/upload', {
+                method: 'POST',
+                body: formData 
+            });
+
+            if (respostaUpload.ok) {
+                const dadosUpload = await respostaUpload.json();
+                urlDaFotoSalva = dadosUpload.url; // Salva o link que o Java gerou!
+            } else {
+                mostrarAlerta("Erro ao salvar a imagem no servidor.", "erro");
+                return; // Para o cadastro se a foto falhar
+            }
+        } catch (erro) {
+            console.error("Erro no servidor de imagens:", erro);
+            mostrarAlerta("Falha de conexão ao enviar imagem.", "erro");
+            return;
+        }
+    }
+
+    // PASSO B: CADASTRA O PARTICIPANTE NO BANCO COM O NOME E O LINK DA FOTO
     try {
         const resposta = await fetch('http://localhost:8081/participantes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nome: nome })
+            body: JSON.stringify({ nome: nome, urlFoto: urlDaFotoSalva })
         });
 
         if (resposta.ok) {
-            mostrarAlerta('Participante adicionado com sucesso!', 'sucesso');
+            mostrarAlerta('Candidato adicionado com sucesso!', 'sucesso');
+            // Limpa o formulário
             inputNome.value = ''; 
-            carregarCardsParticipantes(); // Recarrega os cards
+            inputArquivo.value = ''; 
+            
+            carregarCardsParticipantes(); // Recarrega os cards na tela
+        } else {
+            mostrarAlerta('Erro ao adicionar candidato no banco.', 'erro');
         }
     } catch (erro) {
-        mostrarAlerta('Erro ao adicionar.', 'erro');
+        mostrarAlerta('Erro de conexão ao salvar candidato.', 'erro');
     }
 }
 
+// ==========================================
 // 3. EDITAR (Update)
+// ==========================================
 async function editarParticipante(id, nomeAtual) {
     const novoNome = prompt(`Digite o novo nome para "${nomeAtual}":`, nomeAtual);
     
-    if (!novoNome || novoNome === nomeAtual) return;
+    if (!novoNome || novoNome.trim() === nomeAtual) return;
 
     try {
         const resposta = await fetch(`http://localhost:8081/participantes/${id}`, {
@@ -89,15 +140,19 @@ async function editarParticipante(id, nomeAtual) {
         if (resposta.ok) {
             mostrarAlerta('Nome atualizado!', 'sucesso');
             carregarCardsParticipantes();
+        } else {
+            mostrarAlerta('Erro ao atualizar.', 'erro');
         }
     } catch (erro) {
-        mostrarAlerta('Erro ao editar.', 'erro');
+        mostrarAlerta('Erro de conexão ao editar.', 'erro');
     }
 }
 
+// ==========================================
 // 4. DELETAR (Delete)
+// ==========================================
 async function deletarParticipante(id, nome) {
-    const confirmacao = confirm(`Tem certeza que deseja remover ${nome} do paredão? Todos os votos dele também serão apagados!`);
+    const confirmacao = confirm(`Tem certeza que deseja remover ${nome} da Votação? Todos os votos recebidos por ele também serão apagados!`);
     
     if (!confirmacao) return;
 
@@ -107,25 +162,42 @@ async function deletarParticipante(id, nome) {
         });
 
         if (resposta.ok) {
-            mostrarAlerta('Participante removido do paredão!', 'sucesso');
+            mostrarAlerta('Participante removido da Votação!', 'sucesso');
             carregarCardsParticipantes();
         } else {
             mostrarAlerta('Erro ao remover participante.', 'erro');
         }
     } catch (erro) {
-        mostrarAlerta('Erro de conexão.', 'erro');
+        mostrarAlerta('Erro de conexão ao excluir.', 'erro');
     }
 }
 
-// Utilitário para alertas
+// ==========================================
+// UTILITÁRIOS
+// ==========================================
 function mostrarAlerta(mensagem, tipo) {
     const divAlerta = document.getElementById('mensagem-alerta');
     divAlerta.textContent = mensagem;
-    divAlerta.className = `alerta ${tipo}`; 
+    
+    // Adiciona cores dinâmicas para garantir que fique visível
     divAlerta.style.display = 'block';
+    divAlerta.style.padding = '15px';
+    divAlerta.style.marginBottom = '20px';
+    divAlerta.style.borderRadius = '8px';
+    divAlerta.style.fontWeight = 'bold';
+    divAlerta.style.textAlign = 'center';
+    
+    if (tipo === 'sucesso') {
+        divAlerta.style.backgroundColor = '#d4edda';
+        divAlerta.style.color = '#155724';
+        divAlerta.style.border = '1px solid #c3e6cb';
+    } else {
+        divAlerta.style.backgroundColor = '#f8d7da';
+        divAlerta.style.color = '#721c24';
+        divAlerta.style.border = '1px solid #f5c6cb';
+    }
     
     setTimeout(() => {
-        divAlerta.className = 'alerta oculta';
         divAlerta.style.display = 'none';
-    }, 3000);
+    }, 4000);
 }

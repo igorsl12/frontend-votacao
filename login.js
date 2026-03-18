@@ -1,37 +1,61 @@
-function fazerLogin() {
-    const emailDigitado = document.getElementById("email").value;
-    const senhaDigitada = document.getElementById("senha").value;
+document.addEventListener('DOMContentLoaded', () => {
+    const formLogin = document.getElementById('form-login');
 
-    // Empacotamos os dados para enviar para a API
-    const dadosLogin = {
-        email: emailDigitado,
-        senha: senhaDigitada
-    };
+    formLogin.addEventListener('submit', async (evento) => {
+        evento.preventDefault();
 
-    // Disparamos o POST para o Java
-    fetch("http://localhost:8081/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dadosLogin)
-    })
-    .then(resposta => {
-        if (resposta.ok) {
-            return resposta.json(); // Se o Java disse "OK", extraímos os dados do usuário
-        } else {
-            throw new Error("Login falhou"); // Cai no catch lá embaixo
+        const email = document.getElementById('email').value;
+        const senha = document.getElementById('senha').value;
+
+        const dadosLogin = {
+            email: email,
+            senha: senha
+        };
+
+        try {
+            const resposta = await fetch('http://localhost:8081/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dadosLogin)
+            });
+
+            if (resposta.ok) {
+                // 1. Pegamos os dados do usuário que o Java devolveu
+                const usuario = await resposta.json();
+                
+                // 2. Salvamos o ID e o Nome no "cofre" do navegador (Local Storage)
+                // Assim, a página index.html saberá quem está logado!
+                localStorage.setItem('usuarioLogadoId', usuario.id);
+                localStorage.setItem('usuarioLogadoNome', usuario.nome);
+                localStorage.setItem('usuarioLogadoEmail', usuario.email); 
+
+                // 3. Verificamos o perfil para fazer o redirecionamento correto
+                // ATENÇÃO: Se na sua classe Java o atributo se chamar algo diferente de 'perfil',
+                // como 'role' ou 'tipo', mude a palavra 'perfil' abaixo para bater exatamente!
+                if (usuario.perfil === 'ADMIN') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+                
+            } else {
+                mostrarAlerta('E-mail ou senha incorretos!', 'erro');
+            }
+        } catch (erro) {
+            console.error('Erro de conexão:', erro);
+            mostrarAlerta('Erro ao conectar com o servidor.', 'erro');
         }
-    })
-    .then(usuarioEncontrado => {
-        // MÁGICA: Salva o usuário na "memória" do navegador para as outras telas saberem quem ele é!
-        localStorage.setItem("usuarioLogado", JSON.stringify(usuarioEncontrado));
-        
-        // Redireciona automaticamente para a tela de votação
-        window.location.href = "index.html";
-    })
-    .catch(erro => {
-        // Se deu erro, mostra a mensagem vermelha na tela
-        document.getElementById("mensagem-erro").style.display = "block";
     });
+});
+
+function mostrarAlerta(mensagem, tipo) {
+    const divAlerta = document.getElementById('mensagem-alerta');
+    divAlerta.textContent = mensagem;
+    divAlerta.className = `alerta ${tipo}`; 
+    
+    setTimeout(() => {
+        divAlerta.className = 'alerta oculta';
+    }, 4000);
 }

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - Resultados BBB26</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        
+        <aside class="sidebar sidebar-admin">
+            <div class="user-info">
+                <img src="https://via.placeholder.com/60" alt="Avatar Admin" class="avatar">
+                <h3>Painel Admin</h3>
+                <p>Modo Gerenciamento</p>
+            </div>
+            
+            <nav class="menu">
+                <a href="admin.html" class="menu-item active"><span>📈</span> Resultados em Tempo Real</a>
+                <a href="admin-gerenciar.html" class="menu-item"><span>⚙️</span> Gerenciar Paredão</a>
+            </nav>
+
+            <div class="logout-section">
+                <a href="#" id="btn-sair" class="menu-item logout-btn"><span>🚪</span> Sair</a>
+            </div>
+        </aside>
+
+        <main class="content">
+            <header>
+                <h2>Resultados do Paredão</h2>
+                <p>Acompanhe os votos em tempo real.</p>
+            </header>
+
+            <div class="card" style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <canvas id="graficoVotos"></canvas>
+            </div>
+
+        </main>
+        
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Paredão - Admin BBB26</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        
+        <aside class="sidebar sidebar-admin">
+            <div class="user-info">
+                <img src="https://via.placeholder.com/60" alt="Avatar Admin" class="avatar">
+                <h3>Painel Admin</h3>
+                <p>Modo Gerenciamento</p>
+            </div>
+            
+            <nav class="menu">
+                <a href="admin.html" class="menu-item"><span>📈</span> Resultados em Tempo Real</a>
+                <a href="admin-gerenciar.html" class="menu-item active"><span>⚙️</span> Gerenciar Paredão</a>
+            </nav>
+
+            <div class="logout-section">
+                <a href="#" id="btn-sair" class="menu-item logout-btn"><span>🚪</span> Sair</a>
+            </div>
+        </aside>
+
+        <main class="content">
+            <header>
+                <h2>Gerenciar Participantes</h2>
+                <p>Adicione, edite ou remova quem está no paredão desta semana.</p>
+            </header>
+
+            <div id="mensagem-alerta" class="alerta oculta"></div>
+
+<div class="card" style="margin-bottom: 40px; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto;">                <h3 style="margin-bottom: 15px; color: #2c3e50;">Adicionar ao Paredão</h3>
+                
+                <form id="form-adicionar" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    
+                    <input type="text" id="nome-novo-participante" placeholder="Nome do participante..." required 
+                           style="flex: 1; min-width: 200px; padding: 12px; border-radius: 8px; border: 1px solid #bdc3c7; font-size: 1em;">
+                    
+                    <button type="submit" class="btn-votar" 
+                            style="width: auto; padding: 12px 30px; margin-top: 0;">Adicionar</button>
+                </form>
+            </div>
+            <h3 style="margin-bottom: 10px; color: #2c3e50;">Participantes Atuais</h3>
+            
+            <div class="participantes-grid" id="lista-participantes-admin">
+                <p style="text-align: center; width: 100%;">Carregando...</p>
+            </div>
+
+        </main>
+        
+    </div>
+
+    <script src="admin-gerenciar.js"></script>
+</body>
+</html>

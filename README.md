@@ -44,3 +44,25 @@ Este projeto foi construído "Vanilla", sem o uso de frameworks pesados, para de
 ├── perfil-admin.html       # Gestão de perfil (Admin)
 ├── style.css               # Folha de estilos global
 └── *.js                    # Scripts individuais para cada view (perfil.js, votacao.js, etc.)
+````
+⚙️ Como Executar o Projeto
+
+* Pré-requisito: Certifique-se de que o Back-end em Spring Boot do projeto esteja em execução na sua máquina, rodando na porta 8081 (http://localhost:8081).
+
+* Clone este repositório.
+
+* Como o projeto utiliza apenas HTML, CSS e JS puros, você não precisa instalar dependências (Node.js, npm, etc).
+
+* Abra a pasta do projeto em sua IDE (como VS Code).
+
+* Inicie um servidor estático local (recomenda-se a extensão Live Server do VS Code) no arquivo login.html.
+
+* O navegador abrirá automaticamente a aplicação.
+
+🔒 Segurança Front-end
+
+* Verificação constante de tokens/IDs no localStorage para proteção de rotas.
+
+* Redirecionamentos automáticos em caso de acessos indevidos.
+
+* Limpeza de cache e armazenamento local ao realizar logout ou exclusão de conta.

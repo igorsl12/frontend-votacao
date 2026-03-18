@@ -21,15 +21,14 @@
                 <a href="perfil.html" class="menu-item active"><span>👤</span> Meu Perfil</a>
                 <a href="index.html" class="menu-item"><span>📊</span> Votação Atual</a>
                 <a href="historico.html" class="menu-item"><span>🗳️</span> Histórico de Votos</a>
-                <a href="configuracoes.html" class="menu-item"><span>⚙️</span> Configurações</a>
-            </nav>
+             </nav>
 
             <div class="logout-section">
                 <a href="#" id="btn-sair" class="menu-item logout-btn"><span>🚪</span> Sair</a>
             </div>
         </aside>
 
-        <main class="content" style="display: flex; flex-direction: column; align-items: center; padding-top: 50px;">
+        <main class="content" style="display: flex; flex-direction: column; align-items: center; padding-top: 50px; padding-bottom: 50px;">
             
             <header style="text-align: center; margin-bottom: 40px;">
                 <h2 style="font-size: 2.2em; color: #2c3e50;">Meu Perfil</h2>
@@ -48,26 +47,61 @@
 
                 <div style="display: flex; flex-direction: column; gap: 20px;">
                     
-                    <div>
-                        <label style="display: block; font-weight: bold; color: #34495e; margin-bottom: 8px; font-size: 1.1em;">Seu ID no Sistema</label>
-                        <input type="text" id="perfil-id" disabled style="width: 100%; padding: 15px; background: #ecf0f1; border: 1px solid #bdc3c7; border-radius: 8px; font-weight: bold; color: #7f8c8d; box-sizing: border-box; font-size: 1.1em;">
-                    </div>
-                    
-                    <div>
-                        <label style="display: block; font-weight: bold; color: #34495e; margin-bottom: 8px; font-size: 1.1em;">Nível de Acesso</label>
-                        <input type="text" id="perfil-nivel" disabled style="width: 100%; padding: 15px; background: #ecf0f1; border: 1px solid #bdc3c7; border-radius: 8px; font-weight: bold; box-sizing: border-box; font-size: 1.1em;">
+                    <div style="display: flex; gap: 20px;">
+                        <div style="flex: 1;">
+                            <label style="display: block; font-weight: bold; color: #34495e; margin-bottom: 8px; font-size: 1.1em;">Seu ID no Sistema</label>
+                            <input type="text" id="perfil-id" disabled style="width: 100%; padding: 15px; background: #ecf0f1; border: 1px solid #bdc3c7; border-radius: 8px; font-weight: bold; color: #7f8c8d; box-sizing: border-box; font-size: 1.1em;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="display: block; font-weight: bold; color: #34495e; margin-bottom: 8px; font-size: 1.1em;">Nível de Acesso</label>
+                            <input type="text" id="perfil-nivel" disabled style="width: 100%; padding: 15px; background: #ecf0f1; border: 1px solid #bdc3c7; border-radius: 8px; font-weight: bold; box-sizing: border-box; font-size: 1.1em;">
+                        </div>
                     </div>
 
-                    <div style="margin-top: 15px; padding-top: 30px; border-top: 1px solid #ecf0f1;">
+                   <div style="margin-top: 15px; padding-top: 30px; border-top: 1px solid #ecf0f1;">
                         <label style="display: block; font-weight: bold; color: #34495e; margin-bottom: 8px; font-size: 1.1em;">Atualizar Nome Completo</label>
                         
                         <div style="display: flex; gap: 15px; align-items: stretch;">
-                            <input type="text" id="input-editar-nome" style="width: 100%; padding: 15px; background: #fff; border: 1px solid #bdc3c7; border-radius: 8px; font-weight: bold; color: #2c3e50; box-sizing: border-box; font-size: 1.1em;">
-                            
-                            <button onclick="atualizarNome()" style="background-color: #3498db; color: white; border: none; border-radius: 8px; padding: 0 40px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: 0.3s; box-sizing: border-box;">Salvar</button>
+                            <input type="text" id="input-editar-nome" style="width: 100%; padding: 15px; background: #fff; border: 1px solid #bdc3c7; border-radius: 8px; font-weight: bold; color: #2c3e50; box-sizing: border-box; font-size: 1.1em; margin: 0;">
+                            <button onclick="atualizarNome()" style="background-color: #3498db; color: white; border: none; border-radius: 8px; padding: 0 40px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: 0.3s; box-sizing: border-box; margin: 0; display: flex; align-items: center; justify-content: center; white-space: nowrap;">Salvar</button>
                         </div>
-                        
                         <p id="msg-edit-nome" style="display: none; margin-top: 15px; font-weight: bold; font-size: 1em;"></p>
+                    </div>
+
+                    <div style="margin-top: 15px; padding-top: 30px; border-top: 1px solid #ecf0f1;">
+                        <h3 style="color: #2c3e50; margin-bottom: 20px; font-size: 1.3em;">🔑 Alterar Senha</h3>
+                        
+                        <form id="form-senha" style="display: flex; flex-direction: column; gap: 15px;">
+                            <div>
+                                <label style="display: block; font-weight: bold; color: #34495e; margin-bottom: 5px;">Senha Atual</label>
+                                <input type="password" id="senha-atual" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #bdc3c7; box-sizing: border-box; background: #f9fbfb;">
+                            </div>
+                            
+                            <div style="display: flex; gap: 15px;">
+                                <div style="flex: 1;">
+                                    <label style="display: block; font-weight: bold; color: #34495e; margin-bottom: 5px;">Nova Senha</label>
+                                    <input type="password" id="nova-senha" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #bdc3c7; box-sizing: border-box; background: #f9fbfb;">
+                                </div>
+                                <div style="flex: 1;">
+                                    <label style="display: block; font-weight: bold; color: #34495e; margin-bottom: 5px;">Confirmar Nova Senha</label>
+                                    <input type="password" id="confirmar-senha" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #bdc3c7; box-sizing: border-box; background: #f9fbfb;">
+                                </div>
+                            </div>
+
+                            <button type="submit" style="background-color: #2ecc71; color: white; border: none; border-radius: 8px; padding: 12px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: 0.3s; margin-top: 10px; width: 100%;">
+                                Atualizar Senha
+                            </button>
+                        </form>
+                        <p id="msg-edit-senha" style="display: none; margin-top: 15px; font-weight: bold; font-size: 1em; text-align: center;"></p>
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 30px; border: 2px solid #ffcccc; background-color: #fffafb; border-radius: 12px;">                
+                        <h3 style="margin-bottom: 10px; color: #e74c3c; font-size: 1.3em;">⚠️ Zona de Perigo</h3>
+                        <p style="color: #7f8c8d; font-size: 0.95em; margin-bottom: 20px;">Ao excluir sua conta, você perderá acesso ao sistema permanentemente. Esta ação não pode ser desfeita.</p>
+                        
+                        <button id="btn-excluir-conta" style="width: 100%; background-color: #e74c3c; color: white; border: none; border-radius: 8px; padding: 12px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: 0.3s;">
+                            Excluir Minha Conta
+                        </button>
                     </div>
 
                 </div>

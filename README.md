@@ -45,7 +45,7 @@ Este projeto foi construído "Vanilla", sem o uso de frameworks pesados, para de
 ├── style.css               # Folha de estilos global
 └── *.js                    # Scripts individuais para cada view (perfil.js, votacao.js, etc.)
 ````
-⚙️ Como Executar o Projeto
+## ⚙️ Como Executar o Projeto
 
 * Pré-requisito: Certifique-se de que o Back-end em Spring Boot do projeto esteja em execução na sua máquina, rodando na porta 8081 (http://localhost:8081).
 
@@ -59,7 +59,7 @@ Este projeto foi construído "Vanilla", sem o uso de frameworks pesados, para de
 
 * O navegador abrirá automaticamente a aplicação.
 
-🔒 Segurança Front-end
+## 🔒 Segurança Front-end
 
 * Verificação constante de tokens/IDs no localStorage para proteção de rotas.
 

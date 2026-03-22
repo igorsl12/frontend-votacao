@@ -1,4 +1,34 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // =========================================================
+    // 1. IDENTIFICAÇÃO E FOTO DO ADMIN NO MENU
+    // =========================================================
+    const usuarioLogadoId = localStorage.getItem('usuarioLogadoId');
+    
+    if (!usuarioLogadoId) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    try {
+        const respostaUser = await fetch(`http://localhost:8081/usuarios/${usuarioLogadoId}`);
+        if (respostaUser.ok) {
+            const usuarioDB = await respostaUser.json();
+            
+            // Lógica da foto: banco ou letrinhas
+            if (usuarioDB.foto) {
+                document.getElementById('user-avatar').src = `http://localhost:8081/images/${usuarioDB.foto}`;
+            } else {
+                const nomeCod = encodeURIComponent(usuarioDB.nome || "Admin");
+                document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${nomeCod}&background=3498db&color=fff`;
+            }
+        }
+    } catch (erro) {
+        console.error("Erro ao carregar dados do administrador:", erro);
+    }
+
+    // =========================================================
+    // 2. CARREGAMENTO DA PÁGINA
+    // =========================================================
     carregarCardsParticipantes();
 
     // Captura o envio do formulário para adicionar alguém
@@ -21,7 +51,7 @@ async function carregarCardsParticipantes() {
         const participantes = await resposta.json();
         
         const grid = document.getElementById('lista-participantes-admin');
-        grid.innerHTML = ''; // Limpa o "Carregando..."
+        grid.innerHTML = ''; 
 
         if (participantes.length === 0) {
             grid.innerHTML = '<p style="text-align: center; grid-column: span 3; color: #7f8c8d;">Nenhum candidato cadastrado.</p>';
@@ -32,7 +62,6 @@ async function carregarCardsParticipantes() {
             const card = document.createElement('div');
             card.className = 'card-participante';
             
-            // LÓGICA DAS FOTOS: Usa a foto do banco, ou gera uma automática
             let imagemExibicao = p.urlFoto;
             if (!imagemExibicao || imagemExibicao.trim() === "") {
                 const nomeCod = encodeURIComponent(p.nome);
@@ -53,7 +82,6 @@ async function carregarCardsParticipantes() {
         });
     } catch (erro) {
         console.error('Erro ao listar:', erro);
-        document.getElementById('lista-participantes-admin').innerHTML = '<p style="color: red; grid-column: span 3;">Erro ao carregar dados do servidor.</p>';
     }
 }
 
@@ -67,39 +95,34 @@ async function adicionarParticipante(evento) {
     const inputArquivo = document.getElementById('input-arquivo-foto');
     
     const nome = inputNome.value.trim();
-    let urlDaFotoSalva = ""; // Começa vazia por padrão
+    let urlDaFotoSalva = ""; 
 
     if (!nome) {
         mostrarAlerta("O nome é obrigatório!", "erro");
         return;
     }
 
-    // PASSO A: SE O ADMIN ESCOLHEU UMA IMAGEM, FAZ O UPLOAD PRO SERVIDOR JAVA
+    // Se o Admin escolheu uma imagem, ela deve ser enviada para a rota de arquivos que você configurou no Java
     if (inputArquivo.files.length > 0) {
         const formData = new FormData();
-        formData.append("foto", inputArquivo.files[0]); 
+        formData.append("arquivoFoto", inputArquivo.files[0]); 
 
         try {
-            const respostaUpload = await fetch('http://localhost:8081/arquivos/upload', {
+            // Ajuste aqui se a sua rota de upload de participante for diferente da de usuários
+            const respostaUpload = await fetch('http://localhost:8081/usuarios/upload-externo-opcional', { 
                 method: 'POST',
                 body: formData 
             });
 
             if (respostaUpload.ok) {
                 const dadosUpload = await respostaUpload.json();
-                urlDaFotoSalva = dadosUpload.url; // Salva o link que o Java gerou!
-            } else {
-                mostrarAlerta("Erro ao salvar a imagem no servidor.", "erro");
-                return; // Para o cadastro se a foto falhar
+                urlDaFotoSalva = dadosUpload.urlCompleta; 
             }
         } catch (erro) {
-            console.error("Erro no servidor de imagens:", erro);
-            mostrarAlerta("Falha de conexão ao enviar imagem.", "erro");
-            return;
+            console.error("Erro no upload da imagem:", erro);
         }
     }
 
-    // PASSO B: CADASTRA O PARTICIPANTE NO BANCO COM O NOME E O LINK DA FOTO
     try {
         const resposta = await fetch('http://localhost:8081/participantes', {
             method: 'POST',
@@ -109,16 +132,14 @@ async function adicionarParticipante(evento) {
 
         if (resposta.ok) {
             mostrarAlerta('Candidato adicionado com sucesso!', 'sucesso');
-            // Limpa o formulário
             inputNome.value = ''; 
             inputArquivo.value = ''; 
-            
-            carregarCardsParticipantes(); // Recarrega os cards na tela
+            carregarCardsParticipantes();
         } else {
-            mostrarAlerta('Erro ao adicionar candidato no banco.', 'erro');
+            mostrarAlerta('Erro ao adicionar candidato.', 'erro');
         }
     } catch (erro) {
-        mostrarAlerta('Erro de conexão ao salvar candidato.', 'erro');
+        mostrarAlerta('Erro de conexão.', 'erro');
     }
 }
 
@@ -127,7 +148,6 @@ async function adicionarParticipante(evento) {
 // ==========================================
 async function editarParticipante(id, nomeAtual) {
     const novoNome = prompt(`Digite o novo nome para "${nomeAtual}":`, nomeAtual);
-    
     if (!novoNome || novoNome.trim() === nomeAtual) return;
 
     try {
@@ -140,11 +160,9 @@ async function editarParticipante(id, nomeAtual) {
         if (resposta.ok) {
             mostrarAlerta('Nome atualizado!', 'sucesso');
             carregarCardsParticipantes();
-        } else {
-            mostrarAlerta('Erro ao atualizar.', 'erro');
         }
     } catch (erro) {
-        mostrarAlerta('Erro de conexão ao editar.', 'erro');
+        mostrarAlerta('Erro de conexão.', 'erro');
     }
 }
 
@@ -152,8 +170,7 @@ async function editarParticipante(id, nomeAtual) {
 // 4. DELETAR (Delete)
 // ==========================================
 async function deletarParticipante(id, nome) {
-    const confirmacao = confirm(`Tem certeza que deseja remover ${nome} da Votação? Todos os votos recebidos por ele também serão apagados!`);
-    
+    const confirmacao = confirm(`Remover ${nome}? Todos os votos dele sumirão!`);
     if (!confirmacao) return;
 
     try {
@@ -162,13 +179,11 @@ async function deletarParticipante(id, nome) {
         });
 
         if (resposta.ok) {
-            mostrarAlerta('Participante removido da Votação!', 'sucesso');
+            mostrarAlerta('Removido com sucesso!', 'sucesso');
             carregarCardsParticipantes();
-        } else {
-            mostrarAlerta('Erro ao remover participante.', 'erro');
         }
     } catch (erro) {
-        mostrarAlerta('Erro de conexão ao excluir.', 'erro');
+        mostrarAlerta('Erro ao excluir.', 'erro');
     }
 }
 
@@ -177,9 +192,9 @@ async function deletarParticipante(id, nome) {
 // ==========================================
 function mostrarAlerta(mensagem, tipo) {
     const divAlerta = document.getElementById('mensagem-alerta');
+    if (!divAlerta) return;
+
     divAlerta.textContent = mensagem;
-    
-    // Adiciona cores dinâmicas para garantir que fique visível
     divAlerta.style.display = 'block';
     divAlerta.style.padding = '15px';
     divAlerta.style.marginBottom = '20px';

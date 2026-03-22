@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Votação</title>
+    <link rel="icon" type="image/png" href="imagemCapa.png">
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -12,13 +14,14 @@
         
         <aside class="sidebar">
             <div class="user-info">
-                <img id="user-avatar" src="https://via.placeholder.com/60" alt="Avatar do Usuário" class="avatar">
+                <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=3498db&color=fff" alt="Avatar do Usuário" class="avatar">
                 <h3 id="user-name">Carregando...</h3>
                 <p id="user-email">Carregando...</p>
             </div>
+            
             <nav class="menu">
                 <a href="perfil.html" class="menu-item"><span>👤</span> Meu Perfil</a>
-                <a href="/" class="menu-item active"><span>📊</span> Votação Atual</a>
+                <a href="index.html" class="menu-item active"><span>📊</span> Votação Atual</a>
                 <a href="historico.html" class="menu-item"><span>🗳️</span> Histórico de Votos</a>
              </nav>
 
@@ -28,17 +31,35 @@
         </aside>
 
         <main class="content">
-            <header>
-                <h2>Votação Atual</h2>
-                <p>Escolha quem você quer que ganhe. Seu voto faz a diferença!</p>
+            <header style="text-align: center; margin-bottom: 40px;">
+                <h2 id="titulo-pagina" style="font-size: 2.2em; color: #2c3e50;">Votação Atual</h2>
+                <p id="subtitulo-pagina" style="color: #7f8c8d; font-size: 1.1em; margin-top: 8px;">Escolha quem você quer que ganhe. Seu voto faz a diferença!</p>
             </header>
 
             <div id="mensagem-alerta" class="alerta oculta"></div>
 
             <div class="participantes-grid" id="lista-participantes">
-                
                 <p style="text-align: center; width: 100%;">Carregando...</p>   
             </div>
+
+            <div id="secao-resultados" style="display: none; flex-direction: column; align-items: center; width: 100%;">
+                
+                <div class="card" style="width: 100%; max-width: 800px; padding: 40px; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-radius: 15px; text-align: center; background: #fff;">
+                    
+                    <h3 style="color: #e74c3c; margin-bottom: 10px; font-size: 1.8em;">⚠️ Votação Encerrada</h3>
+                    <p style="color: #7f8c8d; font-size: 1.1em; margin-bottom: 30px;">Obrigado pela sua participação! Confira o resultado final abaixo.</p>
+                    
+                    <div style="position: relative; height: 350px; width: 100%; display: flex; justify-content: center;">
+                        <canvas id="graficoResultadosPublicos"></canvas>
+                    </div>
+
+                    <div id="relatorio-resultados" style="margin-top: 40px; display: flex; flex-direction: column; gap: 12px; text-align: left; border-top: 2px solid #f4f7f6; padding-top: 30px;">
+                        </div>
+                    
+                </div>
+
+            </div>
+
         </main>
         
     </div>

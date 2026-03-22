@@ -1,25 +1,79 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Registra o plugin de texto/porcentagem no Chart.js para o gráfico de pizza
+document.addEventListener('DOMContentLoaded', async () => {
+    // Registra o plugin de texto/porcentagem no Chart.js
     Chart.register(ChartDataLabels);
     
-    // Chama as funções para desenhar os dois gráficos assim que a página carrega
-    carregarDadosDoGrafico();     // Gráfico de Pizza (Total de votos)
-    carregarGraficoFrequencia();  // Gráfico de Linhas (Horários)
+    // =========================================================
+    // 1. IDENTIFICAÇÃO E FOTO DO ADMIN
+    // =========================================================
+    const usuarioLogadoId = localStorage.getItem('usuarioLogadoId');
+    
+    if (!usuarioLogadoId) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Busca dados do admin para atualizar a foto no menu
+    try {
+        const respostaUser = await fetch(`http://localhost:8081/usuarios/${usuarioLogadoId}`);
+        if (respostaUser.ok) {
+            const usuarioDB = await respostaUser.json();
+            
+            // Se tiver foto customizada no banco, usa ela. Senão, usa o gerador de letras.
+            if (usuarioDB.foto) {
+                document.getElementById('user-avatar').src = `http://localhost:8081/images/${usuarioDB.foto}`;
+            } else {
+                const nomeCod = encodeURIComponent(usuarioDB.nome || "Admin");
+                document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${nomeCod}&background=3498db&color=fff`;
+            }
+        }
+    } catch (erro) {
+        console.error("Erro ao carregar dados do administrador:", erro);
+    }
+
+    // =========================================================
+    // 2. INICIALIZAÇÃO DO PAINEL
+    // =========================================================
+    
+    // Pinta o botão de status corretamente assim que a página abre
+    verificarStatusVotacao();
+
+    // Carrega os gráficos
+    carregarDadosDoGrafico();     // Pizza
+    carregarGraficoFrequencia();  // Linhas
 
     // Funcionalidade do botão Sair
     document.getElementById('btn-sair').addEventListener('click', (e) => {
         e.preventDefault();
-        localStorage.clear(); // Limpa o "cofre" do navegador
-        window.location.href = 'login.html'; // Manda de volta pro login
+        localStorage.clear();
+        window.location.href = 'login.html';
     });
+
+    // Clique para abrir/fechar votação
+    const btnAlternar = document.getElementById('btn-alternar-votacao');
+    if (btnAlternar) {
+        btnAlternar.addEventListener('click', async () => {
+            const confirmacao = confirm("Tem certeza que deseja alterar o status da votação agora?");
+            if (!confirmacao) return;
+
+            try {
+                const resposta = await fetch('http://localhost:8081/configuracao/alternar', {
+                    method: 'POST'
+                });
+                const novaConfig = await resposta.json();
+                atualizarVisualDoStatus(novaConfig.votacaoAberta);
+            } catch (erro) {
+                alert("Erro ao alterar o status da votação.");
+            }
+        });
+    }
 });
 
-// Variáveis globais para guardar os gráficos e podermos atualizá-los
+// Variáveis globais para os gráficos
 let meuGrafico;
 let graficoLinha;
 
 // ==========================================================
-// GRÁFICO 1: PIZZA (DISTRIBUIÇÃO DE VOTOS E PORCENTAGEM)
+// GRÁFICOS
 // ==========================================================
 async function carregarDadosDoGrafico() {
     try {
@@ -29,77 +83,48 @@ async function carregarDadosDoGrafico() {
         const nomes = [];
         const quantidadeVotos = [];
 
-        // Para cada participante, busca a quantidade de votos
         for (const participante of participantes) {
             nomes.push(participante.nome);
-
             const respostaVotos = await fetch(`http://localhost:8081/votos/contagem/${participante.id}`);
             const totalVotos = await respostaVotos.json();
-            
             quantidadeVotos.push(totalVotos);
         }
-
         desenharGrafico(nomes, quantidadeVotos);
-
     } catch (erro) {
-        console.error("Erro ao carregar dados do painel admin:", erro);
-        alert("Erro ao carregar os resultados do servidor.");
+        console.error("Erro ao carregar gráfico de pizza:", erro);
     }
 }
 
 function desenharGrafico(labelsNomes, dadosVotos) {
     const ctx = document.getElementById('graficoVotos').getContext('2d');
+    if (meuGrafico) meuGrafico.destroy();
 
-    if (meuGrafico) {
-        meuGrafico.destroy(); // Apaga o antigo antes de desenhar o novo
-    }
-
-    // Calcula o total geral de votos somando tudo no array
     const totalGeralDeVotos = dadosVotos.reduce((a, b) => a + b, 0);
 
     meuGrafico = new Chart(ctx, {
-        type: 'pie', // Gráfico de Pizza
+        type: 'pie',
         data: {
             labels: labelsNomes,
             datasets: [{
-                label: 'Votos',
                 data: dadosVotos,
-                backgroundColor: [
-                    '#e74c3c', // Vermelho
-                    '#3498db', // Azul
-                    '#f1c40f', // Amarelo
-                    '#2ecc71', // Verde
-                    '#9b59b6'  // Roxo
-                ],
+                backgroundColor: ['#e74c3c', '#3498db', '#f1c40f', '#2ecc71', '#9b59b6'],
                 borderWidth: 2,
                 borderColor: '#ffffff'
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false, // Permite que o gráfico cresça no espaço que demos
+            maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        font: { size: 16 },
-                        padding: 20
-                    }
-                },
-                // Configuração do Plugin de Porcentagem
+                legend: { position: 'bottom' },
                 datalabels: {
                     color: '#fff',
-                    font: {
-                        weight: 'bold',
-                        size: 14 // Tamanho do texto dentro da fatia
-                    },
-                    formatter: (value, context) => {
+                    font: { weight: 'bold', size: 14 },
+                    formatter: (value) => {
                         if (totalGeralDeVotos === 0) return '0%';
                         let porcentagem = ((value / totalGeralDeVotos) * 100).toFixed(1);
-                        return `${value} votos\n(${porcentagem}%)`;
+                        return `${value} vts\n(${porcentagem}%)`;
                     },
-                    textShadowBlur: 4,
-                    textShadowColor: 'rgba(0,0,0,0.5)',
                     textAlign: 'center'
                 }
             }
@@ -107,76 +132,76 @@ function desenharGrafico(labelsNomes, dadosVotos) {
     });
 }
 
-// ==========================================================
-// GRÁFICO 2: LINHAS (FREQUÊNCIA DE VOTOS POR HORÁRIO)
-// ==========================================================
 async function carregarGraficoFrequencia() {
-    let labelsHorarios = [];
-    let dadosVotos = [];
-
     try {
-        // Tenta buscar o histórico real no seu Java
         const resposta = await fetch('http://localhost:8081/votos/historico');
-
         if (resposta.ok) {
-            // O Java deve devolver algo como: {"08:00": 10, "09:00": 45, "10:00": 30}
             const historico = await resposta.json();
-            labelsHorarios = Object.keys(historico);
-            dadosVotos = Object.values(historico);
-        } else {
-            throw new Error("Rota não encontrada no Java ainda.");
+            desenharGraficoLinha(Object.keys(historico), Object.values(historico));
         }
     } catch (erro) {
-        // MODO DE SEGURANÇA: Dados de teste enquanto a rota do Java não fica pronta
-        console.warn("Rota /historico não encontrada. Usando dados de teste para exibir o gráfico.");
-        labelsHorarios = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00'];
-        dadosVotos = [12, 45, 30, 89, 65, 110, 95, 140];
+        const labelsMock = ['18:00', '19:00', '20:00', '21:00', '22:00'];
+        const dadosMock = [10, 25, 80, 45, 30];
+        desenharGraficoLinha(labelsMock, dadosMock);
     }
-
-    desenharGraficoLinha(labelsHorarios, dadosVotos);
 }
 
 function desenharGraficoLinha(horarios, votos) {
     const ctx = document.getElementById('graficoFrequencia').getContext('2d');
-
-    if (graficoLinha) {
-        graficoLinha.destroy();
-    }
+    if (graficoLinha) graficoLinha.destroy();
 
     graficoLinha = new Chart(ctx, {
-        type: 'line', // Gráfico de linha
+        type: 'line',
         data: {
             labels: horarios,
             datasets: [{
-                label: 'Votos Registrados',
+                label: 'Votos',
                 data: votos,
-                borderColor: '#3498db', // Cor da linha (Azul)
-                backgroundColor: 'rgba(52, 152, 219, 0.2)', // Preenchimento suave abaixo da linha
-                borderWidth: 3,
-                tension: 0.4, // Curva suave
+                borderColor: '#3498db',
+                backgroundColor: 'rgba(52, 152, 219, 0.2)',
                 fill: true,
-                pointBackgroundColor: '#e74c3c', // Bolinhas vermelhas
-                pointRadius: 5,
-                pointHoverRadius: 8
+                tension: 0.4
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                // Desligamos as porcentagens gigantes neste gráfico para não virar bagunça
-                datalabels: { display: false } 
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: { color: '#ecf0f1' } // Linhas de fundo mais suaves
-                },
-                x: {
-                    grid: { display: false } // Tira as linhas verticais do fundo
-                }
-            }
+            plugins: { datalabels: { display: false }, legend: { display: false } }
         }
     });
+}
+
+// ==========================================
+// STATUS DA VOTAÇÃO
+// ==========================================
+async function verificarStatusVotacao() {
+    try {
+        const resposta = await fetch('http://localhost:8081/configuracao');
+        const config = await resposta.json();
+        atualizarVisualDoStatus(config.votacaoAberta);
+    } catch (erro) {
+        console.error("Erro ao buscar status:", erro);
+    }
+}
+
+function atualizarVisualDoStatus(isAberta) {
+    const textoStatus = document.getElementById('texto-status');
+    const faixaStatus = document.getElementById('faixa-status');
+    const btnAlternar = document.getElementById('btn-alternar-votacao');
+
+    if (!textoStatus || !faixaStatus || !btnAlternar) return;
+
+    if (isAberta) {
+        textoStatus.textContent = "ABERTO";
+        textoStatus.style.color = "#2ecc71";
+        faixaStatus.style.borderLeftColor = "#2ecc71";
+        btnAlternar.textContent = "Encerrar Votação";
+        btnAlternar.style.backgroundColor = "#e74c3c";
+    } else {
+        textoStatus.textContent = "ENCERRADO";
+        textoStatus.style.color = "#e74c3c";
+        faixaStatus.style.borderLeftColor = "#e74c3c";
+        btnAlternar.textContent = "Reabrir Votação";
+        btnAlternar.style.backgroundColor = "#2ecc71";
+    }
 }

@@ -1,23 +1,42 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
     const idLogado = localStorage.getItem('usuarioLogadoId');
-    const nomeLogado = localStorage.getItem('usuarioLogadoNome');
-    const emailLogado = localStorage.getItem('usuarioLogadoEmail');
 
     if (!idLogado) {
         window.location.href = 'login.html';
         return; 
     }
 
-    // 1. Preenche o menu lateral
-    document.getElementById('user-name-menu').textContent = nomeLogado;
-    const emailTexto = (emailLogado && emailLogado !== "null" && emailLogado !== "undefined") ? emailLogado : "E-mail não informado";
-    document.getElementById('user-email-menu').textContent = emailTexto;
+    // ==========================================
+    // 1. BUSCA DADOS E FOTO DO USUÁRIO NO BANCO
+    // ==========================================
+    try {
+        const respostaUser = await fetch(`http://localhost:8081/usuarios/${idLogado}`);
+        if (respostaUser.ok) {
+            const usuarioDB = await respostaUser.ok ? await respostaUser.json() : null;
 
-    const nomeCodificado = encodeURIComponent(nomeLogado);
-    document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${nomeCodificado}&background=3498db&color=fff`;
+            if (usuarioDB) {
+                // Atualiza Nome e E-mail no Menu Lateral
+                document.getElementById('user-name-menu').textContent = usuarioDB.nome;
+                const emailTexto = (usuarioDB.email && usuarioDB.email !== "null") ? usuarioDB.email : "E-mail não informado";
+                document.getElementById('user-email-menu').textContent = emailTexto;
 
-    // 2. Busca o histórico de votos desse usuário no Java
+                // LÓGICA DA FOTO: Tem no banco? Usa a real. Não tem? Usa as iniciais.
+                if (usuarioDB.foto) {
+                    document.getElementById('user-avatar').src = `http://localhost:8081/images/${usuarioDB.foto}`;
+                } else {
+                    const nomeCodificado = encodeURIComponent(usuarioDB.nome);
+                    document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${nomeCodificado}&background=3498db&color=fff`;
+                }
+            }
+        }
+    } catch (erro) {
+        console.error("Erro ao carregar dados do menu lateral:", erro);
+    }
+
+    // ==========================================
+    // 2. BUSCA O HISTÓRICO DE VOTOS
+    // ==========================================
     try {
         const resposta = await fetch(`http://localhost:8081/votos/usuario/${idLogado}`);
         const historico = await resposta.json();
@@ -26,14 +45,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const msgSemVotos = document.getElementById('msg-sem-votos');
         const areaTabela = document.getElementById('area-tabela');
 
-        corpoTabela.innerHTML = ''; // Limpa a mensagem de "Carregando..."
+        if (corpoTabela) corpoTabela.innerHTML = ''; 
 
         if (historico.length === 0) {
-            // Se não tiver votos, esconde a tabela e mostra o botão para ir votar
-            areaTabela.style.display = 'none';
-            msgSemVotos.style.display = 'block';
+            if (areaTabela) areaTabela.style.display = 'none';
+            if (msgSemVotos) msgSemVotos.style.display = 'block';
         } else {
-            // Se tiver votos, desenha as linhas da tabela
             historico.forEach(voto => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -47,13 +64,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     } catch (erro) {
         console.error("Erro ao buscar histórico:", erro);
-        document.getElementById('corpo-tabela-historico').innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Erro ao carregar o histórico de votos.</td></tr>`;
+        const corpo = document.getElementById('corpo-tabela-historico');
+        if (corpo) corpo.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Erro ao carregar o histórico de votos.</td></tr>`;
     }
 
     // Funcionalidade de Sair
-    document.getElementById('btn-sair').addEventListener('click', (e) => {
-        e.preventDefault();
-        localStorage.clear(); 
-        window.location.href = 'login.html'; 
-    });
+    const btnSair = document.getElementById('btn-sair');
+    if (btnSair) {
+        btnSair.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.clear(); 
+            window.location.href = 'login.html'; 
+        });
+    }
 });

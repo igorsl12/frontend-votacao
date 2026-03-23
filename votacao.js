@@ -104,8 +104,8 @@ function carregarParticipantes() {
                 card.innerHTML = `
                     <img src="${imagemExibicao}" alt="Foto de ${participante.nome}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid #3498db; margin-bottom: 15px;">
                     <h3 style="font-size: 1.5em; color: #2c3e50; margin-bottom: 15px;">${participante.nome}</h3>
-                    <button class="btn-votar" onclick="registrarVoto(${participante.id}, '${participante.nome}')" style="background-color: #e74c3c; color: white; border: none; padding: 10px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;">
-                        VOTAR
+                    <button class="btn-votar" onclick="abrirModalCaptcha(${participante.id}, '${participante.nome}')" style="background-color: #e74c3c; color: white; border: none; padding: 10px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s;">
+                      VOTAR
                     </button>
                 `;
                 grid.appendChild(card);
@@ -205,6 +205,50 @@ function registrarVoto(participanteId, nomeParticipante) {
     .catch(erro => {
         mostrarAlerta('Erro de conexão com o servidor.', 'erro');
     });
+}
+// ==========================================
+// LÓGICA ANTI-BOT (CAPTCHA MATEMÁTICO)
+// ==========================================
+let candidatoSelecionadoId = null;
+let candidatoSelecionadoNome = "";
+let respostaCorretaCaptcha = 0;
+
+function abrirModalCaptcha(id, nome) {
+    candidatoSelecionadoId = id;
+    candidatoSelecionadoNome = nome;
+    
+    // Gera dois números aleatórios entre 1 e 10
+    const v1 = Math.floor(Math.random() * 10) + 1;
+    const v2 = Math.floor(Math.random() * 10) + 1;
+    respostaCorretaCaptcha = v1 + v2;
+    
+    // Preenche os dados no HTML do Modal
+    document.getElementById('nome-candidato-modal').textContent = nome;
+    document.getElementById('valor1').textContent = v1;
+    document.getElementById('valor2').textContent = v2;
+    document.getElementById('resposta-captcha').value = ''; // Limpa o campo
+    
+    // Mostra o Modal na tela
+    document.getElementById('modal-captcha').style.display = 'flex';
+}
+
+function fecharModal() {
+    document.getElementById('modal-captcha').style.display = 'none';
+}
+
+function verificarCaptcha() {
+    const respostaUsuario = parseInt(document.getElementById('resposta-captcha').value);
+    
+    if (respostaUsuario === respostaCorretaCaptcha) {
+        // Acertou! Fecha o modal e manda o voto pra API
+        fecharModal();
+        registrarVoto(candidatoSelecionadoId, candidatoSelecionadoNome);
+    } else {
+        // Errou! Provável robô ou erro de digitação
+        mostrarAlerta("Resposta incorreta! Tente novamente para provar que não é um robô.", "erro");
+        // Gera uma nova conta para dificultar
+        abrirModalCaptcha(candidatoSelecionadoId, candidatoSelecionadoNome);
+    }
 }
 
 // ==========================================

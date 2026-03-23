@@ -14,13 +14,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Busca dados do admin para atualizar a foto no menu
     try {
-        const respostaUser = await fetch(`http://localhost:8081/usuarios/${usuarioLogadoId}`);
+        const respostaUser = await fetch(`https://api-votacao-zg4p.onrender.com/usuarios/${usuarioLogadoId}`);
         if (respostaUser.ok) {
             const usuarioDB = await respostaUser.json();
             
             // Se tiver foto customizada no banco, usa ela. Senão, usa o gerador de letras.
             if (usuarioDB.foto) {
-                document.getElementById('user-avatar').src = `http://localhost:8081/images/${usuarioDB.foto}`;
+                document.getElementById('user-avatar').src = `https://api-votacao-zg4p.onrender.com/images/${usuarioDB.foto}`;
             } else {
                 const nomeCod = encodeURIComponent(usuarioDB.nome || "Admin");
                 document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${nomeCod}&background=3498db&color=fff`;
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!confirmacao) return;
 
             try {
-                const resposta = await fetch('http://localhost:8081/configuracao/alternar', {
+                const resposta = await fetch('https://api-votacao-zg4p.onrender.com/configuracao/alternar', {
                     method: 'POST'
                 });
                 const novaConfig = await resposta.json();
@@ -77,7 +77,7 @@ let graficoLinha;
 // ==========================================================
 async function carregarDadosDoGrafico() {
     try {
-        const respostaParticipantes = await fetch('http://localhost:8081/participantes');
+        const respostaParticipantes = await fetch('https://api-votacao-zg4p.onrender.com/participantes');
         const participantes = await respostaParticipantes.json();
 
         const nomes = [];
@@ -85,7 +85,7 @@ async function carregarDadosDoGrafico() {
 
         for (const participante of participantes) {
             nomes.push(participante.nome);
-            const respostaVotos = await fetch(`http://localhost:8081/votos/contagem/${participante.id}`);
+            const respostaVotos = await fetch(`https://api-votacao-zg4p.onrender.com/votos/contagem/${participante.id}`);
             const totalVotos = await respostaVotos.json();
             quantidadeVotos.push(totalVotos);
         }
@@ -134,7 +134,7 @@ function desenharGrafico(labelsNomes, dadosVotos) {
 
 async function carregarGraficoFrequencia() {
     try {
-        const resposta = await fetch('http://localhost:8081/votos/historico');
+        const resposta = await fetch('https://api-votacao-zg4p.onrender.com/votos/historico');
         if (resposta.ok) {
             const historico = await resposta.json();
             desenharGraficoLinha(Object.keys(historico), Object.values(historico));
@@ -176,7 +176,7 @@ function desenharGraficoLinha(horarios, votos) {
 // ==========================================
 async function verificarStatusVotacao() {
     try {
-        const resposta = await fetch('http://localhost:8081/configuracao');
+        const resposta = await fetch('https://api-votacao-zg4p.onrender.com/configuracao');
         const config = await resposta.json();
         atualizarVisualDoStatus(config.votacaoAberta);
     } catch (erro) {

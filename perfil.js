@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // BUSCA OS DADOS FRESQUINHOS DIRETO DO BANCO DE DADOS
     try {
-        const resposta = await fetch(`http://localhost:8081/usuarios/${idLogado}`);
+        const resposta = await fetch(`https://api-votacao-zg4p.onrender.com/usuarios/${idLogado}`);
         
         if (resposta.ok) {
             const usuarioDB = await resposta.json();
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (fotoExibicao) {
                 // Se tem foto no banco (Admin ou Eleitor), usa ela!
-                const urlReal = `http://localhost:8081/images/${fotoExibicao}`;
+                const urlReal = `https://api-votacao-zg4p.onrender.com/images/${fotoExibicao}`;
                 document.getElementById('perfil-avatar-grande').src = urlReal;
                 document.getElementById('user-avatar').src = urlReal; 
                 imagemOriginal = urlReal; 
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            const resposta = await fetch(`http://localhost:8081/usuarios/${idLogado}/senha`, {
+            const resposta = await fetch(`https://api-votacao-zg4p.onrender.com/usuarios/${idLogado}/senha`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ senhaAtual: senhaAtual, novaSenha: novaSenha })
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!confirmacao2) return;
 
             try {
-                const resposta = await fetch(`http://localhost:8081/usuarios/${idLogado}`, {
+                const resposta = await fetch(`https://api-votacao-zg4p.onrender.com/usuarios/${idLogado}`, {
                     method: 'DELETE'
                 });
 
@@ -198,7 +198,7 @@ async function fazerUploadFoto() {
     formData.append("arquivoFoto", arquivo);
 
     try {
-        const resposta = await fetch(`http://localhost:8081/usuarios/${idLogado}/foto`, {
+        const resposta = await fetch(`https://api-votacao-zg4p.onrender.com/usuarios/${idLogado}/foto`, {
             method: 'POST',
             body: formData
         });
@@ -242,7 +242,7 @@ async function atualizarNome() {
     }
 
     try {
-        const resposta = await fetch(`http://localhost:8081/usuarios/${idLogado}`, {
+        const resposta = await fetch(`https://api-votacao-zg4p.onrender.com/usuarios/${idLogado}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nome: novoNome })

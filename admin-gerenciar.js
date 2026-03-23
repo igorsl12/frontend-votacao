@@ -10,13 +10,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        const respostaUser = await fetch(`http://localhost:8081/usuarios/${usuarioLogadoId}`);
+        const respostaUser = await fetch(`https://api-votacao-zg4p.onrender.com/usuarios/${usuarioLogadoId}`);
         if (respostaUser.ok) {
             const usuarioDB = await respostaUser.json();
             
             // Lógica da foto: banco ou letrinhas
             if (usuarioDB.foto) {
-                document.getElementById('user-avatar').src = `http://localhost:8081/images/${usuarioDB.foto}`;
+                document.getElementById('user-avatar').src = `https://api-votacao-zg4p.onrender.com/images/${usuarioDB.foto}`;
             } else {
                 const nomeCod = encodeURIComponent(usuarioDB.nome || "Admin");
                 document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${nomeCod}&background=3498db&color=fff`;
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ==========================================
 async function carregarCardsParticipantes() {
     try {
-        const resposta = await fetch('http://localhost:8081/participantes');
+        const resposta = await fetch('https://api-votacao-zg4p.onrender.com/participantes');
         const participantes = await resposta.json();
         
         const grid = document.getElementById('lista-participantes-admin');
@@ -109,7 +109,7 @@ async function adicionarParticipante(evento) {
 
         try {
             // Ajuste aqui se a sua rota de upload de participante for diferente da de usuários
-            const respostaUpload = await fetch('http://localhost:8081/usuarios/upload-externo-opcional', { 
+            const respostaUpload = await fetch('https://api-votacao-zg4p.onrender.com/usuarios/upload-externo-opcional', { 
                 method: 'POST',
                 body: formData 
             });
@@ -124,7 +124,7 @@ async function adicionarParticipante(evento) {
     }
 
     try {
-        const resposta = await fetch('http://localhost:8081/participantes', {
+        const resposta = await fetch('https://api-votacao-zg4p.onrender.com/participantes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nome: nome, urlFoto: urlDaFotoSalva })
@@ -151,7 +151,7 @@ async function editarParticipante(id, nomeAtual) {
     if (!novoNome || novoNome.trim() === nomeAtual) return;
 
     try {
-        const resposta = await fetch(`http://localhost:8081/participantes/${id}`, {
+        const resposta = await fetch(`https://api-votacao-zg4p.onrender.com/participantes/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ nome: novoNome })
@@ -174,7 +174,7 @@ async function deletarParticipante(id, nome) {
     if (!confirmacao) return;
 
     try {
-        const resposta = await fetch(`http://localhost:8081/participantes/${id}`, {
+        const resposta = await fetch(`https://api-votacao-zg4p.onrender.com/participantes/${id}`, {
             method: 'DELETE'
         });
 

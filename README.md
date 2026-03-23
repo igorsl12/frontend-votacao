@@ -47,7 +47,7 @@ Este projeto foi construído "Vanilla", sem o uso de frameworks pesados, para de
 ````
 ## ⚙️ Como Executar o Projeto
 
-* Pré-requisito: Certifique-se de que o Back-end em Spring Boot do projeto esteja em execução na sua máquina, rodando na porta 8081 (http://localhost:8081).
+* Pré-requisito: Certifique-se de que o Back-end em Spring Boot do projeto esteja em execução na sua máquina, rodando na porta 8081 (https://api-votacao-zg4p.onrender.com).
 
 * Clone este repositório.
 

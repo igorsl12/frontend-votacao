@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const novoUsuario = { nome, email, senha };
 
         try {
-            const resposta = await fetch('http://localhost:8081/usuarios', {
+            const resposta = await fetch('https://api-votacao-zg4p.onrender.com/usuarios', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

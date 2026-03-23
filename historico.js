@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. BUSCA DADOS E FOTO DO USUÁRIO NO BANCO
     // ==========================================
     try {
-        const respostaUser = await fetch(`http://localhost:8081/usuarios/${idLogado}`);
+        const respostaUser = await fetch(`https://api-votacao-zg4p.onrender.com/usuarios/${idLogado}`);
         if (respostaUser.ok) {
             const usuarioDB = await respostaUser.json();
 
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('user-email-menu').textContent = emailTexto;
 
                 if (usuarioDB.foto) {
-                    document.getElementById('user-avatar').src = `http://localhost:8081/images/${usuarioDB.foto}`;
+                    document.getElementById('user-avatar').src = `https://api-votacao-zg4p.onrender.com/images/${usuarioDB.foto}`;
                 } else {
                     const nomeCodificado = encodeURIComponent(usuarioDB.nome);
                     document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${nomeCodificado}&background=3498db&color=fff`;
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!confirmacao) return;
 
             try {
-                const resposta = await fetch(`http://localhost:8081/votos/usuario/${idLogado}/limpar-historico`, {
+                const resposta = await fetch(`https://api-votacao-zg4p.onrender.com/votos/usuario/${idLogado}/limpar-historico`, {
                     method: 'PUT' // Rota que marcamos como visivelNoHistorico = false
                 });
 
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ==========================================
 async function carregarHistorico(idLogado) {
     try {
-        const resposta = await fetch(`http://localhost:8081/votos/usuario/${idLogado}`);
+        const resposta = await fetch(`https://api-votacao-zg4p.onrender.com/votos/usuario/${idLogado}`);
         const historico = await resposta.json();
 
         const corpoTabela = document.getElementById('corpo-tabela-historico');

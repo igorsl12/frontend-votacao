@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // 2. CARREGAR A TELA
 function carregarParticipantes() {
-    fetch("http://localhost:8081/participantes")
+    fetch("https://api-votacao-zg4p.onrender.com/participantes")
         .then(resposta => resposta.json())
         .then(dados => {
             const container = document.getElementById("participantes-container");
@@ -60,7 +60,7 @@ function carregarParticipantes() {
                     nomesParaGrafico.push(participante.nome);
                     
                     // A CORREÇÃO: Em vez de fazer o push bagunçado, nós guardamos a promessa de resposta
-                    let promessa = fetch(`http://localhost:8081/votos/contagem/${participante.id}`)
+                    let promessa = fetch(`https://api-votacao-zg4p.onrender.com/votos/contagem/${participante.id}`)
                         .then(res => res.json());
                     
                     promessasDeVotos.push(promessa); // As promessas ficam na mesma ordem dos nomes
@@ -92,14 +92,14 @@ function carregarParticipantes() {
 
 // 3. ATUALIZAR NÚMEROS
 function atualizarContagemTextos(id) {
-    fetch(`http://localhost:8081/votos/contagem/${id}`)
+    fetch(`https://api-votacao-zg4p.onrender.com/votos/contagem/${id}`)
         .then(resposta => resposta.json())
         .then(total => {
             const el = document.getElementById(`votos-${id}`);
             if (el) el.innerText = total;
         });
 
-    fetch(`http://localhost:8081/votos/porcentagem/${id}`)
+    fetch(`https://api-votacao-zg4p.onrender.com/votos/porcentagem/${id}`)
         .then(resposta => resposta.json())
         .then(pct => {
             const el = document.getElementById(`pct-${id}`);
@@ -111,7 +111,7 @@ function atualizarContagemTextos(id) {
 function votar(participanteId) {
     const usuarioId = usuarioLogado.id;
 
-    fetch(`http://localhost:8081/votos/${participanteId}/${usuarioId}`, { method: "POST" })
+    fetch(`https://api-votacao-zg4p.onrender.com/votos/${participanteId}/${usuarioId}`, { method: "POST" })
     .then(resposta => {
         if(resposta.ok) {
             if (usuarioLogado.perfil === "ADMIN") {
@@ -165,7 +165,7 @@ function adicionarParticipante() {
     const nome = document.getElementById("novo-participante").value;
     if (!nome) return alert("Digite o nome do novo participante!");
 
-    fetch("http://localhost:8081/participantes", {
+    fetch("https://api-votacao-zg4p.onrender.com/participantes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nome: nome })
@@ -186,7 +186,7 @@ function editarParticipante(id, nomeAtual) {
     
     if (!novoNome || novoNome === nomeAtual) return;
 
-    fetch(`http://localhost:8081/participantes/${id}`, {
+    fetch(`https://api-votacao-zg4p.onrender.com/participantes/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nome: novoNome })
@@ -200,7 +200,7 @@ function editarParticipante(id, nomeAtual) {
 function excluirParticipante(id) {
     if (!confirm("Atenção: Isso apagará o participante e TODOS os votos dele. Continuar?")) return;
 
-    fetch(`http://localhost:8081/participantes/${id}`, {
+    fetch(`https://api-votacao-zg4p.onrender.com/participantes/${id}`, {
         method: "DELETE"
     }).then(resposta => {
         if (resposta.ok) {

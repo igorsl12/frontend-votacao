@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const resposta = await fetch('http://localhost:8081/login', {
+            const resposta = await fetch('https://api-votacao-zg4p.onrender.com/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

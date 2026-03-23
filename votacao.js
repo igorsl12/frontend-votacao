@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 3. BUSCA FOTO E DADOS REAIS DO USUÁRIO NO BANCO
     // ==========================================
     try {
-        const resposta = await fetch(`http://localhost:8081/usuarios/${usuarioLogadoId}`);
+        const resposta = await fetch(`https://api-votacao-zg4p.onrender.com/usuarios/${usuarioLogadoId}`);
         if (resposta.ok) {
             const usuarioDB = await resposta.json();
 
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // LÓGICA DA FOTO: Se tiver foto customizada no banco, usa. Senão, usa as iniciais.
             if (usuarioDB.foto) {
-                document.getElementById('user-avatar').src = `http://localhost:8081/images/${usuarioDB.foto}`;
+                document.getElementById('user-avatar').src = `https://api-votacao-zg4p.onrender.com/images/${usuarioDB.foto}`;
             } else {
                 const nomeCodificado = encodeURIComponent(usuarioDB.nome);
                 document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${nomeCodificado}&background=3498db&color=fff`;
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ==========================================
 async function verificarStatusVotacao() {
     try {
-        const resposta = await fetch('http://localhost:8081/configuracao');
+        const resposta = await fetch('https://api-votacao-zg4p.onrender.com/configuracao');
         const config = await resposta.json();
         
         if (config.votacaoAberta) {
@@ -80,7 +80,7 @@ async function verificarStatusVotacao() {
 // FUNÇÃO QUANDO A VOTAÇÃO ESTÁ ABERTA
 // ==========================================
 function carregarParticipantes() {
-    fetch('http://localhost:8081/participantes')
+    fetch('https://api-votacao-zg4p.onrender.com/participantes')
         .then(response => response.json())
         .then(participantes => {
             const grid = document.getElementById('lista-participantes');
@@ -122,7 +122,7 @@ function carregarParticipantes() {
 // ==========================================
 async function carregarResultadosFinais() {
     try {
-        const resposta = await fetch('http://localhost:8081/votos/resultados');
+        const resposta = await fetch('https://api-votacao-zg4p.onrender.com/votos/resultados');
         const resultados = await resposta.json();
 
         resultados.sort((a, b) => b.votos - a.votos);
@@ -192,7 +192,7 @@ async function carregarResultadosFinais() {
 // AÇÃO DE VOTAR
 // ==========================================
 function registrarVoto(participanteId, nomeParticipante) {
-    const url = `http://localhost:8081/votos/${participanteId}/${usuarioLogadoId}`;
+    const url = `https://api-votacao-zg4p.onrender.com/votos/${participanteId}/${usuarioLogadoId}`;
 
     fetch(url, { method: 'POST' })
     .then(resposta => {

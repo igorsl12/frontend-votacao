@@ -86,7 +86,7 @@ async function carregarCardsParticipantes() {
 }
 
 // ==========================================
-// 2. CRIAR (Create) - COM UPLOAD DE FOTO
+// 2. CRIAR (Create) - COM CONVERSÃO BASE64
 // ==========================================
 async function adicionarParticipante(evento) {
     evento.preventDefault();
@@ -95,51 +95,50 @@ async function adicionarParticipante(evento) {
     const inputArquivo = document.getElementById('input-arquivo-foto');
     
     const nome = inputNome.value.trim();
-    let urlDaFotoSalva = ""; 
 
     if (!nome) {
         mostrarAlerta("O nome é obrigatório!", "erro");
         return;
     }
 
-    // Se o Admin escolheu uma imagem, ela deve ser enviada para a rota de arquivos que você configurou no Java
-    if (inputArquivo.files.length > 0) {
-        const formData = new FormData();
-        formData.append("arquivoFoto", inputArquivo.files[0]); 
-
+    // Função interna que faz o disparo para a API
+    const enviarParaAPI = async (fotoBase64) => {
         try {
-            // Ajuste aqui se a sua rota de upload de participante for diferente da de usuários
-            const respostaUpload = await fetch('https://api-votacao-zg4p.onrender.com/usuarios/upload-externo-opcional', { 
+            const resposta = await fetch('https://api-votacao-zg4p.onrender.com/participantes', {
                 method: 'POST',
-                body: formData 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome: nome, urlFoto: fotoBase64 })
             });
 
-            if (respostaUpload.ok) {
-                const dadosUpload = await respostaUpload.json();
-                urlDaFotoSalva = dadosUpload.urlCompleta; 
+            if (resposta.ok) {
+                mostrarAlerta('Candidato adicionado com sucesso!', 'sucesso');
+                inputNome.value = ''; 
+                inputArquivo.value = ''; // Limpa o campo do arquivo
+                carregarCardsParticipantes();
+            } else {
+                mostrarAlerta('Erro ao adicionar candidato.', 'erro');
             }
         } catch (erro) {
-            console.error("Erro no upload da imagem:", erro);
+            mostrarAlerta('Erro de conexão.', 'erro');
         }
-    }
+    };
 
-    try {
-        const resposta = await fetch('https://api-votacao-zg4p.onrender.com/participantes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nome: nome, urlFoto: urlDaFotoSalva })
-        });
-
-        if (resposta.ok) {
-            mostrarAlerta('Candidato adicionado com sucesso!', 'sucesso');
-            inputNome.value = ''; 
-            inputArquivo.value = ''; 
-            carregarCardsParticipantes();
-        } else {
-            mostrarAlerta('Erro ao adicionar candidato.', 'erro');
-        }
-    } catch (erro) {
-        mostrarAlerta('Erro de conexão.', 'erro');
+    // A MÁGICA ACONTECE AQUI:
+    // Se o Admin escolheu uma imagem, transforma em texto (Base64)
+    if (inputArquivo.files.length > 0) {
+        const leitor = new FileReader();
+        
+        // Quando terminar de ler a foto, dispara para a API
+        leitor.onloadend = function() {
+            const codigoBase64DaFoto = leitor.result; 
+            enviarParaAPI(codigoBase64DaFoto);
+        };
+        
+        // Inicia a leitura do arquivo do computador
+        leitor.readAsDataURL(inputArquivo.files[0]);
+    } else {
+        // Se não escolheu foto, envia a URL vazia
+        enviarParaAPI("");
     }
 }
 
